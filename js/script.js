@@ -43,6 +43,7 @@ class CitiesList {
 				console.log(error);
 			});
 	}
+	// Анимация показа городов
 	animateShowCities() {
 		const scroll = document.querySelector(`.dropdown`).scrollTop;
 		document.querySelector(`.dropdown-lists`).style.cssText = `
@@ -88,6 +89,7 @@ class CitiesList {
 			}
 		}
 	}
+	// Анимация скрытия городов
 	animateHideCities() {
 		document.querySelector(`.dropdown-lists`).style.cssText = `
 			display: block;
