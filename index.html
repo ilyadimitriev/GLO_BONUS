@@ -10,20 +10,21 @@
   <title>Document</title>
 </head>
 
-<body>
+<body> 
   <section class="main">
-    <div class="input-cities">
+    <div class="load-svg"><div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>
+    <div class="input-cities ">
       <input id="select-cities" type="text" placeholder="">
       <div class="close-button"></div>
       <label class="label" for="select-cities">Страна или город</label>
       <span class="focus-border"><i></i></span>
       <div class="dropdown">
         <div class="dropdown-lists">
-          <div class="dropdown-lists__list dropdown-lists__list--default">
+          <div class="dropdown-lists__list dropdown-lists__list--select">
             <div class="dropdown-lists__col">
             </div>
           </div>
-          <div class="dropdown-lists__list dropdown-lists__list--select">
+          <div class="dropdown-lists__list dropdown-lists__list--default">
             <div class="dropdown-lists__col">
             </div>
           </div>
@@ -38,7 +39,6 @@
   </section>
 </body>
 
-<script src="js/db_cities.js"></script>
 <script src="js/script.js"></script>
 
 </html>
