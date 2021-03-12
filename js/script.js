@@ -317,42 +317,28 @@ class CitiesList {
 			document.querySelector(`.label`).classList.add(`opacity`);
 			const reg = new RegExp(value, `i`);
 			let suitableCities = [];
-			const handleInput = data => {
-				data.forEach(country => {
-					suitableCities = [...suitableCities, ...country.cities.filter(city => reg.test(city.name))];
+			JSON.parse(localStorage.getItem('data')).forEach(country => {
+				suitableCities = [...suitableCities, ...country.cities.filter(city => reg.test(city.name))];
+			});
+			dropdownlistAutocomplete.querySelector(`.dropdown-lists__col`).innerHTML = ``;
+			if (suitableCities.length !== 0) {
+				const countryBlock = document.createElement(`div`);
+				countryBlock.classList.add(`dropdown-lists__countryBlock`);
+				suitableCities.forEach(city => {
+					countryBlock.insertAdjacentHTML(`beforeend`, `
+						<div class="dropdown-lists__line">
+							<div class="dropdown-lists__city">${city.name}</div>
+							<div class="dropdown-lists__count">${city.count}</div>
+						</div>
+					`);
 				});
-				dropdownlistAutocomplete.querySelector(`.dropdown-lists__col`).innerHTML = ``;
-				if (suitableCities.length !== 0) {
-					const countryBlock = document.createElement(`div`);
-					countryBlock.classList.add(`dropdown-lists__countryBlock`);
-					suitableCities.forEach(city => {
-						countryBlock.insertAdjacentHTML(`beforeend`, `
-							<div class="dropdown-lists__line">
-								<div class="dropdown-lists__city">${city.name}</div>
-								<div class="dropdown-lists__count">${city.count}</div>
-							</div>
-						`);
-					});
-					dropdownlistAutocomplete.querySelector(`.dropdown-lists__col`).append(countryBlock.cloneNode(true));
-				} else {
-					const response = document.createElement(`div`);
-					response.classList.add(`dropdown-lists__line`);
-					response.textContent = `Ничего не найдено`;
-					dropdownlistAutocomplete.querySelector(`.dropdown-lists__col`).append(response);
-				}
-			};
-			fetch(`http://localhost:3000/RU`)
-				.then(response => {
-					if (response.status !== 200) {
-						throw new Error(`Возникла ошибка при отправки данных`);
-					} else {
-						return response.json();
-					}
-				})
-				.then(data => handleInput(data))
-				.catch(error => {
-					console.log(error);
-				});
+				dropdownlistAutocomplete.querySelector(`.dropdown-lists__col`).append(countryBlock.cloneNode(true));
+			} else {
+				const response = document.createElement(`div`);
+				response.classList.add(`dropdown-lists__line`);
+				response.textContent = `Ничего не найдено`;
+				dropdownlistAutocomplete.querySelector(`.dropdown-lists__col`).append(response);
+			}
 		} else {
 			document.querySelector(`.label`).classList.remove(`opacity`);
 			droplistDefault.classList.add(`display-block`);
