@@ -136,6 +136,7 @@ class CitiesList {
 	}
 	clearInput() {
 		document.querySelector(`.close-button`).addEventListener(`click`, () => {
+			document.querySelector(`.label`).classList.remove(`opacity`);
 			document.getElementById(`select-cities`).value = ``;
 			droplistDefault.classList.remove(`display-block`);
 			droplistSelect.classList.remove(`display-block`);
@@ -156,6 +157,7 @@ class CitiesList {
 		document.querySelector(`.dropdown-lists`).addEventListener(`click`, event => {
 			let targetValue = ``;
 			if (event.target.closest(`.dropdown-lists__line`) || event.target.closest(`.dropdown-lists__total-line`)) {
+				document.querySelector(`.label`).classList.add(`opacity`);
 				if (event.target.closest(`.dropdown-lists__line`)) {
 					const target = event.target.closest(`.dropdown-lists__line`);
 					targetValue = target.querySelector(`.dropdown-lists__city`).textContent;
@@ -172,6 +174,7 @@ class CitiesList {
 				} else if (event.target.closest(`.dropdown-lists__total-line`)) {
 					const target = event.target.closest(`.dropdown-lists__total-line`);
 					targetValue = target.querySelector(`.dropdown-lists__country`).textContent;
+					this.handleLinkButton(false);
 				}
 
 				document.getElementById(`select-cities`).value = targetValue;
@@ -246,6 +249,7 @@ class CitiesList {
 			droplistDefault.classList.remove(`display-block`);
 			droplistSelect.classList.remove(`display-block`);
 			dropdownlistAutocomplete.classList.add(`display-block`);
+			document.querySelector(`.label`).classList.add(`opacity`);
 			const reg = new RegExp(value, `i`);
 			let suitableCities = [];
 			const handleInput = (data) => {
@@ -285,6 +289,7 @@ class CitiesList {
 					console.log(error);
 				});
 		} else {
+			document.querySelector(`.label`).classList.remove(`opacity`);
 			droplistDefault.classList.add(`display-block`);
 			droplistSelect.classList.remove(`display-block`);
 			dropdownlistAutocomplete.classList.remove(`display-block`);
