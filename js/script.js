@@ -6,9 +6,12 @@ const dropdownlistAutocomplete = document.querySelector(`.dropdown-lists__list--
 
 class CitiesList {
 	constructor() {
-		this.progData = [];
 	}
 	start() {
+		if (!this.handleLangCookie()) {
+			document.querySelector(`.lds-spinner`).remove();
+			return;
+		}
 		this.getData.call(this);
 		document.getElementById(`select-cities`).addEventListener(`focus`, () => {
 			if (!droplistSelect.classList.contains(`display-block`) &&
@@ -25,23 +28,85 @@ class CitiesList {
 		this.nameToInput.call(this);
 		this.clearInput.call(this);
 	}
+	getCookie(name) {
+		let matches = document.cookie.match(new RegExp(
+			"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+		));
+		return matches ? decodeURIComponent(matches[1]) : undefined;
+	}
+	handleLangCookie() {
+		if (this.getCookie(`lang`)) {
+			return true;
+		} else {
+			const lang = this.selectLanguage.call(this);
+			if (lang) {
+				document.cookie = `lang=${lang}`;
+				localStorage.removeItem('data');
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	selectLanguage() {
+		let language;
+		const reg = new RegExp(`(^RU$)|(^EN$)|(^DE$)`);
+		do {
+			language = prompt(`Select your language (RU, EN, DE)`);
+			if (language === null) {
+				return false;
+			}
+		} while (!reg.test(language));
+		return language;
+	}
 	getData() {
-		fetch(`http://localhost:3000/RU`)
-			.then(response => {
-				if (response.status !== 200) {
-					throw new Error(`Возникла ошибка при отправки данных`);
-				} else {
-					return response.json();
-				}
-			})
-			.then(data => {
-				this.progData = JSON.parse(JSON.stringify(data));
-				document.querySelector(`.input-cities`).classList.remove(`opacity`);
-				document.querySelector(`.lds-spinner`).remove();
-			})
-			.catch(error => {
-				console.log(error);
-			});
+		if (localStorage.getItem('data')) {
+			document.querySelector(`.input-cities`).classList.remove(`opacity`);
+			document.querySelector(`.lds-spinner`).remove();
+		} else {
+			fetch(`http://localhost:3000/${this.getCookie(`lang`)}`)
+				.then(response => {
+					if (response.status !== 200) {
+						document.querySelector(`.lds-spinner`).innerHTML = `Возникла ошибка при получении данных`;
+						document.querySelector(`.lds-spinner`).classList.remove(`lds-spinner`);
+						throw new Error(`Возникла ошибка при получении данных`);
+					} else {
+						return response.json();
+					}
+				})
+				.then(data => {
+					const lang = this.getCookie(`lang`);
+					// Ставим страну первой в списке в зависимости от выбранного языка
+					const sortData = [];
+					data.forEach((country, index) => {
+						if (lang === `RU`) {
+							if (index !== 0) {
+								sortData.push(country);
+							} else {
+								sortData.unshift(country);
+							}
+						} else if (lang === `DE`) {
+							if (index !== 1) {
+								sortData.push(country);
+							} else {
+								sortData.unshift(country);
+							}
+						} else {
+							if (index !== 2) {
+								sortData.push(country);
+							} else {
+								sortData.unshift(country);
+							}
+						}
+					});
+					localStorage.setItem('data', JSON.stringify(sortData));
+					document.querySelector(`.input-cities`).classList.remove(`opacity`);
+					document.querySelector(`.lds-spinner`).remove();
+				})
+				.catch(error => {
+					console.log(error);
+				});
+		}
 	}
 	// Анимация показа городов
 	animateShowCities() {
@@ -162,7 +227,7 @@ class CitiesList {
 					const target = event.target.closest(`.dropdown-lists__line`);
 					targetValue = target.querySelector(`.dropdown-lists__city`).textContent;
 					let link = ``;
-					this.progData.find(country => {
+					JSON.parse(localStorage.getItem('data')).find(country => {
 						const selectedCity = country.cities.find(city => city.name === targetValue);
 						if (selectedCity) {
 							link = selectedCity.link;
@@ -199,7 +264,7 @@ class CitiesList {
 	}
 	formListDefault() {
 		droplistDefault.querySelector(`.dropdown-lists__col`).innerHTML = ``;
-		const citiesData = JSON.parse(JSON.stringify(this.progData));
+		const citiesData = JSON.parse(localStorage.getItem('data'));
 		const countryBlock = document.createElement(`div`);
 		citiesData.forEach(country => {
 			countryBlock.classList.add(`dropdown-lists__countryBlock`);
@@ -222,7 +287,7 @@ class CitiesList {
 		});
 	}
 	formDroplistSelect(countryName) {
-		const selectedCountry = this.progData.find(elem => elem.country === countryName);
+		const selectedCountry = JSON.parse(localStorage.getItem('data')).find(elem => elem.country === countryName);
 		droplistSelect.querySelector(`.dropdown-lists__col`).innerHTML = ``;
 		const countryBlock = document.createElement(`div`);
 		countryBlock.classList.add(`dropdown-lists__countryBlock`);
@@ -252,7 +317,7 @@ class CitiesList {
 			document.querySelector(`.label`).classList.add(`opacity`);
 			const reg = new RegExp(value, `i`);
 			let suitableCities = [];
-			const handleInput = (data) => {
+			const handleInput = data => {
 				data.forEach(country => {
 					suitableCities = [...suitableCities, ...country.cities.filter(city => reg.test(city.name))];
 				});
