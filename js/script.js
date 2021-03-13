@@ -255,8 +255,7 @@ class CitiesList {
 				if (droplistSelect.classList.contains(`display-block`)) {
 					this.animateHideCities();
 				} else {
-					const cityTarget = event.target.closest(`.dropdown-lists__country`);
-					const countryName = cityTarget.textContent;
+					const countryName = target.querySelector(`.dropdown-lists__country`).textContent;
 					this.formDroplistSelect(countryName);
 				}
 			}
